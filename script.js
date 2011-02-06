@@ -65,33 +65,52 @@ function handleKeyPresses(event){
   if (event.keyCode == keyCodes.right) rectangleType = 'right';
   var rectangle = createRectangle(lastRectangle, rectangleType);
 
-  drawRectangle(rectangle);
-  focusElementsInsideRectangle(rectangle);
-  lastRectangle = rectangle;
+  var elementsInsideRectangle = findElementsInsideRectangle(rectangle);
+  if (elementsInsideRectangle.length == 0){
+    hideNavigable();
+  }
+  else if (elementsInsideRectangle.length == 1){
+    elementsInsideRectangle[0].focus();
+    hideNavigable();
+  }
+  else{
+    var firstElement = elementsInsideRectangle[0];
+    var firstElementOffset = firstElement.offset();
+    var elementExtremities = {
+      top: firstElementOffset.top,
+      left: firstElementOffset.left,
+      right: firstElementOffset.left + firstElement.width(),
+      bottom: firstElementOffset.top + firstElement.height()
+    };
+    $.each(elementsInsideRectangle, function(index, element){
+        var elementOffset = element.offset();
+        if (elementOffset.left < elementExtremities.left) elementExtremities.left = elementOffset.left;
+        if (elementOffset.top < elementExtremities.top) elementExtremities.top = elementOffset.top;
+        if (elementOffset.left + element.width() > elementExtremities.right) elementExtremities.right = elementOffset.left + element.width();
+        if (elementOffset.top + element.height() > elementExtremities.bottom) elementExtremities.bottom = elementOffset.top + element.height();
+    });
+    rectangle = {x: elementExtremities.left, y: elementExtremities.top, width: elementExtremities.right - elementExtremities.left, height: elementExtremities.bottom - elementExtremities.top};
+    drawRectangle(rectangle);
+    lastRectangle = rectangle;
+  }
 }
 
-function focusElementsInsideRectangle(rectangle){
+function findElementsInsideRectangle(rectangle){
   var foundElements = [];
   $('a, input').each(function(){
       var element = $(this);
       var offset = element.offset();
-      if (offset.top > rectangle.y){
-        if (offset.left > rectangle.x){
-          if (offset.left + element.width() < rectangle.x + rectangle.width){
-            if (offset.top + element.height() < rectangle.y + rectangle.height){
+      if (offset.top >= rectangle.y){
+        if (offset.left >= rectangle.x){
+          if (offset.left + element.width() <= rectangle.x + rectangle.width){
+            if (offset.top + element.height() <= rectangle.y + rectangle.height){
               foundElements.push(element);
             }
           }
         }
       }
   });
-  if (foundElements.length == 0){
-    hideNavigable();
-  }
-  else if (foundElements.length == 1){
-    foundElements[0].focus();
-    hideNavigable();
-  }
+  return foundElements;
 }
 
 function drawRectangle(rectangle){
