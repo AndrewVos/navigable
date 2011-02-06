@@ -2,6 +2,12 @@
   "name": "Navigable",
   "version": "0.1",
   "description": "Navigable",
-  "permissions": [
-  ]
+  "content_scripts": [{
+    "matches": [ "http://*/*", "https://*/*" ],
+    "js": [
+      "js/jquery.js",
+      "js/script.js"
+    ],
+    "run_at": "document_start"
+  }]
 }
