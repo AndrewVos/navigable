@@ -89,6 +89,11 @@ function handleKeyPresses(event){
         if (elementOffset.left + element.width() > elementExtremities.right) elementExtremities.right = elementOffset.left + element.width();
         if (elementOffset.top + element.height() > elementExtremities.bottom) elementExtremities.bottom = elementOffset.top + element.height();
     });
+    var padding = 3;
+    elementExtremities.top = elementExtremities.top - padding;
+    elementExtremities.left = elementExtremities.left - padding;
+    elementExtremities.bottom = elementExtremities.bottom + padding;
+    elementExtremities.right = elementExtremities.right + padding;
     rectangle = {x: elementExtremities.left, y: elementExtremities.top, width: elementExtremities.right - elementExtremities.left, height: elementExtremities.bottom - elementExtremities.top};
     drawRectangle(rectangle);
     lastRectangle = rectangle;
